@@ -1,0 +1,66 @@
+blueprint:
+  name: ESPHome Wizmote Receiver
+  domain: automation
+  source_url: https://github.com/krakowski/wizmote-esphome/blob/main/blueprint.yml
+  input:
+    remote:
+      name: WizMote Mac address
+      description: Mac address of the WizMote can be found by watching for
+        'esphome.wizmote_action' events as you press a button.
+      selector:
+        text:
+    switch_one:
+      name: Switch 1
+      description: The switch to control after pressing 1
+      selector:
+        target:
+          entity:
+            domain: switch
+    switch_two:
+      name: Switch 2
+      description: The switch to control after pressing 2
+      selector:
+        target:
+          entity:
+            domain: switch
+    switch_three:
+      name: Switch 3
+      description: The switch to control after pressing 3
+      selector:
+        target:
+          entity:
+            domain: switch
+    switch_four:
+      name: Switch 4
+      description: The switch to control after pressing 4
+      selector:
+        target:
+          entity:
+            domain: switch
+
+mode: restart
+
+trigger:
+  platform: event
+  event_type: esphome.wizmote_action
+  event_data:
+    mac: !input "remote"
+
+action:
+  - variables:
+      button: "{{ trigger.event.data.button | int }}"
+      switch_one: !input switch_one
+      switch_two: !input switch_two
+      switch_three: !input switch_three
+      switch_four: !input switch_four
+      switch: "\n{% if button == 8 %}\n \
+        \ {{ switch_one }}\n \
+        \ {% elif button == 4 %}\n \
+        \ {{ switch_two }}\n \
+        \ {% elif button == 32 %}\n \
+        \ {{ switch_three }}\n \
+        \ {% elif button == 16 %}\n \
+        \ {{ switch_four }}\n \
+        \ {% endif %}\n"
+  - service: switch.toggle
+  	target: "{{ switch }}"
