@@ -63,4 +63,3 @@ action:
         \ {{ switch_four }}\n \
         \ {% endif %}\n"
   - service: switch.toggle
-    target: "{{ switch }}"
